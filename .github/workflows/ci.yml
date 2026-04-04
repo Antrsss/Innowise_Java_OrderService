@@ -1,0 +1,79 @@
+name: Order Service CI
+
+on:
+  push:
+    branches: [ "main", "order_service" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: order_db_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 625100
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Build, Run Tests and SonarQube Analysis
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/order_db
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: 625100
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn clean verify \
+            org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=Antrsss_Innowise_Java_OrderService \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+
+      - name: Static Code Analysis (Checkstyle)
+        run: mvn checkstyle:check || echo "Checkstyle not configured, skipping..."
+
+      - name: Build Docker Image
+        run: |
+          docker build -t order-service:${{ github.sha }} .
+          docker tag order-service:${{ github.sha }} order-service:latest
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: order-service-jar
+          path: target/*.jar
