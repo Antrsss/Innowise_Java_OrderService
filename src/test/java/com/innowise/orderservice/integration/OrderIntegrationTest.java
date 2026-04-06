@@ -2,6 +2,7 @@ package com.innowise.orderservice.integration;
 
 import com.innowise.orderservice.dao.ItemDao;
 import com.innowise.orderservice.entity.Item;
+import com.innowise.orderservice.service.OrderService;
 import org.junit.jupiter.api.BeforeEach;
 import com.innowise.orderservice.dto.OrderDto;
 import com.innowise.orderservice.dto.OrderItemDto;
@@ -9,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
@@ -18,8 +21,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class OrderIntegrationTest extends BaseIntegrationTest {
 
-  @Autowired
   private MockMvc mockMvc;
+
+  @Autowired
+  private WebApplicationContext webApplicationContext;
 
   @Autowired
   private ItemDao itemDao;
@@ -34,6 +39,8 @@ class OrderIntegrationTest extends BaseIntegrationTest {
     itemDao.save(item);
 
     itemId = item.getId();
+
+    this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
   }
 
   @Test

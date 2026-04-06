@@ -2,7 +2,9 @@ package com.innowise.orderservice.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.innowise.orderservice.dao.ItemDao;
+import com.innowise.orderservice.dao.OrderDao;
 import com.innowise.orderservice.dto.ItemDto;
+import com.innowise.orderservice.dto.OrderItemDto;
 import com.innowise.orderservice.entity.Item;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.hamcrest.Matchers.*;
@@ -22,8 +26,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 class ItemIntegrationTest extends BaseIntegrationTest {
 
-  @Autowired
   private MockMvc mockMvc;
+
+  @Autowired
+  private WebApplicationContext webApplicationContext;
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -31,11 +37,15 @@ class ItemIntegrationTest extends BaseIntegrationTest {
   @Autowired
   private ItemDao itemDao;
 
+  @Autowired
+  private OrderDao orderDao;
+
   private ItemDto validItemDto;
   private Item existingItem;
 
   @BeforeEach
   void setUp() {
+    orderDao.deleteAll();
     itemDao.deleteAll();
 
     validItemDto = ItemDto.builder()
@@ -48,6 +58,8 @@ class ItemIntegrationTest extends BaseIntegrationTest {
         .price(49.99)
         .build();
     existingItem = itemDao.save(existingItem);
+
+    this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
   }
 
   @Test

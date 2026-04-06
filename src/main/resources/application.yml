@@ -3,13 +3,13 @@ application:
 
 services:
   user-service:
-    url: ${USER_SERVICE_HOST:localhost:8081}
+    url: ${USER_SERVICE_HOST}
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/order_db
-    username: postgres
-    password: 625100
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   liquibase:
