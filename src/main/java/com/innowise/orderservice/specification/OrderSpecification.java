@@ -5,6 +5,7 @@ import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 public class OrderSpecification {
 
@@ -14,16 +15,28 @@ public class OrderSpecification {
     return (root, query, cb) -> cb.isFalse(root.get("deleted"));
   }
 
-  public static Specification<Order> hasStatus(String status) {
+  public static Specification<Order> hasUserId(Long userId) {
     return (root, query, cb) -> {
-      if (status == null || status.isEmpty()) return null;
-      return cb.equal(root.get("status"), status);
+      if (userId == null)
+        return cb.conjunction();
+
+      return cb.equal(root.get("userId"), userId);
+    };
+  }
+
+  public static Specification<Order> hasStatuses(Collection<String> statuses) {
+    return (root, query, cb) -> {
+      if (statuses == null || statuses.isEmpty())
+        return cb.conjunction();
+
+      return root.get("status").in(statuses);
     };
   }
 
   public static Specification<Order> createdBetween(LocalDateTime startDate, LocalDateTime endDate) {
     return (root, query, cb) -> {
-      if (startDate == null && endDate == null) return null;
+      if (startDate == null && endDate == null)
+        return cb.conjunction();
 
       Predicate predicate = cb.conjunction();
       if (startDate != null) {

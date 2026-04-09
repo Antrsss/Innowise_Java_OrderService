@@ -73,14 +73,14 @@ public class OrderController {
 
   @GetMapping
   public ResponseEntity<Page<OrderResponseDto>> getAllOrders(
-      @RequestParam(required = false) String status,
+      @RequestParam(required = false) List<String> status,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
       Pageable pageable,
       @RequestHeader(USER_EMAIL_HEADER) String email
   ) {
-    Page<Order> ordersPage = orderService.findAll(status, startDate, endDate, pageable);
     UserDto userInfo = userClient.findUserByEmail(email);
+    Page<Order> ordersPage = orderService.findAll(userInfo.getId(), status, startDate, endDate, pageable);
 
     Page<OrderResponseDto> response = ordersPage.map(o ->
         new OrderResponseDto(orderMapper.toDto(o), userInfo));

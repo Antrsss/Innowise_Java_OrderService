@@ -7,13 +7,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public interface OrderService {
   Order createOrder(Order order) throws ResourceConflictException, EntityNotFoundException;
   Order findOrderById(Long id) throws EntityNotFoundException;
   List<Order> findOrdersByUserId(Long id);
-  Page<Order> findAll(String status, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+  Page<Order> findAll(Long userId, Collection<String> status, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
   Order updateOrder(Order order) throws EntityNotFoundException;
   void deleteOrder(Long id) throws EntityNotFoundException;
 }

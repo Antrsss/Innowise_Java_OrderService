@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -54,11 +55,13 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public Page<Order> findAll(String status, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
-    Specification<Order> specification = Specification
-        .where(OrderSpecification.isNotDeleted())
-        .and(OrderSpecification.hasStatus(status))
-        .and(OrderSpecification.createdBetween(startDate, endDate));
+  public Page<Order> findAll(Long userId, Collection<String> status, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+    Specification<Order> specification = Specification.allOf(
+        OrderSpecification.isNotDeleted(),
+        OrderSpecification.hasUserId(userId),
+        OrderSpecification.hasStatuses(status),
+        OrderSpecification.createdBetween(startDate, endDate)
+    );
 
     return orderDao.findAll(specification, pageable);
   }

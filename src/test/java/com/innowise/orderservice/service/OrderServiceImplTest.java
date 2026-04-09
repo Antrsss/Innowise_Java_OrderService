@@ -130,10 +130,32 @@ class OrderServiceImplTest {
   void findAll_Success() {
     Page<Order> page = new PageImpl<>(List.of(testOrder));
     when(orderDao.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
-    Page<Order> result = orderService.findAll("NEW", null, null, Pageable.unpaged());
+    Page<Order> result = orderService.findAll(
+        testOrder.getUserId(),
+        List.of("NEW"),
+        null,
+        null,
+        Pageable.unpaged()
+    );
 
     assertNotNull(result);
     assertEquals(1, result.getTotalElements());
+    verify(orderDao).findAll(any(Specification.class), any(Pageable.class));
+  }
+
+  @Test
+  void findAll_WithEmptyStatus_Success() {
+    Page<Order> page = new PageImpl<>(List.of(testOrder));
+    when(orderDao.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
+    Page<Order> result = orderService.findAll(
+        testOrder.getUserId(),
+        null,
+        null,
+        null,
+        Pageable.unpaged()
+    );
+
+    assertNotNull(result);
     verify(orderDao).findAll(any(Specification.class), any(Pageable.class));
   }
 

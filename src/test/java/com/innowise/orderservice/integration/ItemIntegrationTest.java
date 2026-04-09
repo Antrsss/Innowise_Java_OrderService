@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.innowise.orderservice.dao.ItemDao;
 import com.innowise.orderservice.dao.OrderDao;
 import com.innowise.orderservice.dto.ItemDto;
-import com.innowise.orderservice.dto.OrderItemDto;
 import com.innowise.orderservice.entity.Item;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

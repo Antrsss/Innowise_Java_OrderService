@@ -106,8 +106,9 @@ class ItemServiceImplTest {
 
     List<Item> result = itemService.findAllItems();
 
-    assertThat(result).hasSize(2);
-    assertThat(result).containsExactly(existingItem, item);
+    assertThat(result)
+        .hasSize(2)
+        .containsExactly(existingItem, item);
     verify(itemDao).findAll();
   }
 

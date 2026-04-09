@@ -2,7 +2,6 @@ package com.innowise.orderservice.integration;
 
 import com.innowise.orderservice.dao.ItemDao;
 import com.innowise.orderservice.entity.Item;
-import com.innowise.orderservice.service.OrderService;
 import org.junit.jupiter.api.BeforeEach;
 import com.innowise.orderservice.dto.OrderDto;
 import com.innowise.orderservice.dto.OrderItemDto;
