@@ -1,8 +1,6 @@
 package com.innowise.orderservice.service;
 
-import com.innowise.orderservice.client.UserClient;
 import com.innowise.orderservice.dao.OrderDao;
-import com.innowise.orderservice.dto.UserDto;
 import com.innowise.orderservice.entity.Order;
 import com.innowise.orderservice.entity.OrderItem;
 import com.innowise.orderservice.exception.EntityNotFoundException;
@@ -32,9 +30,6 @@ class OrderServiceImplTest {
   @Mock
   private OrderDao orderDao;
 
-  @Mock
-  private UserClient userClient;
-
   @InjectMocks
   private OrderServiceImpl orderService;
 
@@ -51,9 +46,7 @@ class OrderServiceImplTest {
   @Test
   void createOrder_Success() throws ResourceConflictException, EntityNotFoundException {
     when(orderDao.findById(1L)).thenReturn(Optional.empty());
-    when(userClient.findUserById(100L)).thenReturn(Optional.of(new UserDto()));
     when(orderDao.save(any(Order.class))).thenReturn(testOrder);
-
     Order result = orderService.createOrder(testOrder);
 
     assertNotNull(result);
@@ -62,12 +55,11 @@ class OrderServiceImplTest {
   }
 
   @Test
-  void createOrder_WithItems_Success() throws ResourceConflictException, EntityNotFoundException {
+  void createOrder_WithItems_Success() throws ResourceConflictException {
     OrderItem item = new OrderItem();
     testOrder.setItems(List.of(item));
 
     when(orderDao.findById(1L)).thenReturn(Optional.empty());
-    when(userClient.findUserById(100L)).thenReturn(Optional.of(new UserDto()));
     when(orderDao.save(any(Order.class))).thenReturn(testOrder);
 
     Order result = orderService.createOrder(testOrder);
@@ -83,22 +75,6 @@ class OrderServiceImplTest {
 
     assertThrows(ResourceConflictException.class, () -> orderService.createOrder(testOrder));
     verify(orderDao, never()).save(any());
-  }
-
-  @Test
-  void createOrder_ThrowsNotFound_WhenUserDoesNotExist() {
-    when(orderDao.findById(1L)).thenReturn(Optional.empty());
-    when(userClient.findUserById(100L)).thenReturn(Optional.empty());
-
-    assertThrows(EntityNotFoundException.class, () -> orderService.createOrder(testOrder));
-  }
-
-  @Test
-  void createOrder_ThrowsNotFound_WhenUserIdIsNull() {
-    testOrder.setUserId(null);
-
-    assertThrows(EntityNotFoundException.class, () -> orderService.createOrder(testOrder));
-    verify(userClient, never()).findUserById(any());
   }
 
   @Test

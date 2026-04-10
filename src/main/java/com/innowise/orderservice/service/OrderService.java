@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 public interface OrderService {
-  Order createOrder(Order order) throws ResourceConflictException, EntityNotFoundException;
+  Order createOrder(Order order) throws ResourceConflictException;
   Order findOrderById(Long id) throws EntityNotFoundException;
   List<Order> findOrdersByUserId(Long id);
   Page<Order> findAll(Long userId, Collection<String> status, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);

@@ -10,10 +10,10 @@ import java.util.Optional;
 public interface OrderDao extends JpaRepository<Order, Long>,
     JpaSpecificationExecutor<Order> {
 
-  @EntityGraph(attributePaths = {"orderItems", "orderItems.item"})
+  @EntityGraph(attributePaths = {"items", "items.item"})
   Optional<Order> findByIdAndDeletedFalse(Long orderId);
 
-  @EntityGraph(attributePaths = {"orderItems", "orderItems.item"})
+  @EntityGraph(attributePaths = {"items", "items.item"})
   List<Order> findAllByUserIdAndDeletedFalse(Long userId);
 
   @Modifying

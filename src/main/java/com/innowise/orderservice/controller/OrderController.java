@@ -5,6 +5,7 @@ import com.innowise.orderservice.dto.OrderDto;
 import com.innowise.orderservice.dto.OrderResponseDto;
 import com.innowise.orderservice.dto.UserDto;
 import com.innowise.orderservice.entity.Order;
+import com.innowise.orderservice.exception.EntityNotFoundException;
 import com.innowise.orderservice.mapper.OrderMapper;
 import com.innowise.orderservice.service.OrderService;
 import jakarta.validation.Valid;
@@ -35,10 +36,14 @@ public class OrderController {
       @Valid @RequestBody OrderDto orderDto,
       @RequestHeader(USER_EMAIL_HEADER) String email
   ) {
-    Order orderEntity = orderMapper.toEntity(orderDto);
-    Order order = orderService.createOrder(orderEntity);
-
     UserDto userInfo = userClient.findUserByEmail(email);
+    if (userInfo == null) {
+      throw new EntityNotFoundException("User for this order not found");
+    }
+
+    Order orderEntity = orderMapper.toEntity(orderDto);
+    orderEntity.setUserId(userInfo.getId());
+    Order order = orderService.createOrder(orderEntity);
 
     OrderResponseDto response = new OrderResponseDto(orderMapper.toDto(order), userInfo);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);

@@ -23,17 +23,12 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
 
   private final OrderDao orderDao;
-  private final UserClient userClient;
 
   @Override
   @Transactional
-  public Order createOrder(Order order) throws ResourceConflictException, EntityNotFoundException {
+  public Order createOrder(Order order) throws ResourceConflictException {
     if (order.getId() != null && orderDao.findById(order.getId()).isPresent()) {
       throw new ResourceConflictException("Order already exists");
-    }
-
-    if (order.getUserId() == null || userClient.findUserById(order.getUserId()).isEmpty()) {
-      throw new EntityNotFoundException("User for this order not found");
     }
 
     if (order.getItems() != null) {

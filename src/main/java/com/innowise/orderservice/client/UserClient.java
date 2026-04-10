@@ -12,17 +12,21 @@ import java.util.Optional;
 public interface UserClient {
 
   @GetMapping("/api/users")
-  @CircuitBreaker(name = "userServiceBreaker", fallbackMethod = "findUserFallback")
+  @CircuitBreaker(name = "userServiceBreaker", fallbackMethod = "findUserByEmailFallback")
   UserDto findUserByEmail(@RequestParam("email") String email);
 
   @GetMapping
-  @CircuitBreaker(name = "userServiceBreaker", fallbackMethod = "findUserFallback")
+  @CircuitBreaker(name = "userServiceBreaker", fallbackMethod = "findUserByIdFallback")
   Optional<UserDto> findUserById(@RequestParam("id") Long id);
 
-  default UserDto findUserFallback(String email) {
+  default UserDto findUserByEmailFallback(String email, Throwable t) {
     UserDto fallbackUser = new UserDto();
     fallbackUser.setEmail(email);
     fallbackUser.setName("Service Unavailable");
     return fallbackUser;
+  }
+
+  default Optional<UserDto> findUserByIdFallback(Long id, Throwable t) {
+    return Optional.empty();
   }
 }
