@@ -4,6 +4,7 @@ import com.innowise.orderservice.dto.UserDto;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Optional;
@@ -15,9 +16,9 @@ public interface UserClient {
   @CircuitBreaker(name = "userServiceBreaker", fallbackMethod = "findUserByEmailFallback")
   UserDto findUserByEmail(@RequestParam("email") String email);
 
-  @GetMapping
+  @GetMapping("/api/users/{id}")
   @CircuitBreaker(name = "userServiceBreaker", fallbackMethod = "findUserByIdFallback")
-  Optional<UserDto> findUserById(@RequestParam("id") Long id);
+  Optional<UserDto> findUserById(@PathVariable("id") Long id);
 
   default UserDto findUserByEmailFallback(String email, Throwable t) {
     UserDto fallbackUser = new UserDto();
@@ -27,6 +28,9 @@ public interface UserClient {
   }
 
   default Optional<UserDto> findUserByIdFallback(Long id, Throwable t) {
-    return Optional.empty();
+    UserDto fallbackUser = new UserDto();
+    fallbackUser.setId(id);
+    fallbackUser.setName("Service Unavailable");
+    return Optional.of(fallbackUser);
   }
 }
